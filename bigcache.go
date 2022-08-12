@@ -120,7 +120,16 @@ func (c *BigCache) Close() error {
 func (c *BigCache) Get(key string) ([]byte, error) {
 	hashedKey := c.hash.Sum64(key)
 	shard := c.getShard(hashedKey)
-	return shard.get(key, hashedKey)
+	return shard.get(key, hashedKey, nil)
+}
+
+//GetCb callback executed when set successful
+type GetCb func()
+
+func (c *BigCache) GetCb(key string, cb GetCb) ([]byte, error) {
+	hashedKey := c.hash.Sum64(key)
+	shard := c.getShard(hashedKey)
+	return shard.get(key, hashedKey, cb)
 }
 
 // GetWithInfo reads entry for the key with Response info.

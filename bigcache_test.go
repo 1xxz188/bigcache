@@ -1277,15 +1277,22 @@ func TestSetCb(t *testing.T) {
 		noError(t, cache.Close())
 	}()
 
+	err = cache.Set("key1", []byte("value2"))
+	noError(t, err)
+
 	isCalled := false
+	v, err := cache.GetCb("key1", func() {
+		isCalled = true
+	})
+	noError(t, err)
+	assertEqual(t, true, isCalled)
+	assertEqual(t, []byte("value2"), v)
+
+	isCalled = false
 	err = cache.SetCb("key", []byte("value"), func() {
 		isCalled = true
 	})
 
 	noError(t, err)
 	assertEqual(t, true, isCalled)
-
-	//in order to verify that it is not affected when cb was nil
-	err = cache.Set("key2", []byte("value2"))
-	noError(t, err)
 }
